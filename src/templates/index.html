@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nb">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EU Kontroll Statistics</title>
+    <title>EU-kontroll Statistikk</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,14 +19,30 @@
         h1, h2 {
             color: #333;
         }
+        .intro {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
         .search-container {
             margin: 20px 0;
+            position: relative;
         }
         #searchInput {
             padding: 10px;
             width: 300px;
             border: 1px solid #ddd;
             border-radius: 4px;
+        }
+        .loading {
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
         }
         .vehicle-lists {
             display: grid;
@@ -49,6 +65,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            font-size: 14px;
         }
         th, td {
             padding: 12px;
@@ -57,6 +74,7 @@
         }
         th {
             background-color: #f8f8f8;
+            font-weight: bold;
         }
         tr:hover {
             background-color: #f5f5f5;
@@ -69,27 +87,46 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             display: none;
         }
+        .approval-rate {
+            font-weight: bold;
+            color: #2c5282;
+        }
+        .fault-count {
+            color: #c53030;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>EU Kontroll Statistics</h1>
+        <h1>EU-kontroll Statistikk</h1>
         
+        <div class="intro">
+            <h2>Om Dataene</h2>
+            <p>Denne analysen er basert på EU-kontroll data fra første kvartal 2023. Statistikken viser:</p>
+            <ul>
+                <li><strong>Godkjenningsrate:</strong> Prosentandel av kjøretøy som bestod kontrollen</li>
+                <li><strong>Gjennomsnittlige Alvorlige Feil:</strong> Gjennomsnittlig antall kode 2 og kode 3 feil per kontroll</li>
+                <li><strong>Utvalgsstørrelse:</strong> Inkluderer kun modeller med 30+ kontroller for statistisk pålitelighet</li>
+            </ul>
+            <p>Bruk disse dataene som hjelp når du skal kjøpe bil ved å identifisere modeller med konsistent gode kontrollresultater.</p>
+        </div>
+
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search by make or model...">
+            <input type="text" id="searchInput" placeholder="Søk etter merke eller modell (f.eks. 'Volvo V70')">
+            <span class="loading" id="loadingIndicator">Søker...</span>
         </div>
 
         <div class="search-results" id="searchResults">
-            <h2>Search Results</h2>
+            <h2>Søkeresultater</h2>
             <table id="searchResultsTable">
                 <thead>
                     <tr>
-                        <th>Make</th>
-                        <th>Model</th>
-                        <th>Year</th>
-                        <th>Approval Rate</th>
-                        <th>Avg. Serious Faults</th>
-                        <th>Total Inspections</th>
+                        <th>Merke</th>
+                        <th>Modell</th>
+                        <th>År</th>
+                        <th>Godkjenningsrate</th>
+                        <th>Gj.snitt Alvorlige Feil</th>
+                        <th>Antall Kontroller</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -98,15 +135,15 @@
 
         <div class="vehicle-lists">
             <div class="vehicle-list">
-                <h2>Top 20 Most Reliable Vehicles</h2>
+                <h2>Topp 20 Mest Pålitelige Biler</h2>
                 <table>
                     <thead>
                         <tr>
-                            <th>Make</th>
-                            <th>Model</th>
-                            <th>Year</th>
-                            <th>Approval Rate</th>
-                            <th>Avg. Serious Faults</th>
+                            <th>Merke</th>
+                            <th>Modell</th>
+                            <th>År</th>
+                            <th>Godkjenningsrate</th>
+                            <th>Gj.snitt Alvorlige Feil</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -115,8 +152,8 @@
                             <td>{{ vehicle.make }}</td>
                             <td>{{ vehicle.model }}</td>
                             <td>{{ vehicle.year }}</td>
-                            <td>{{ vehicle.approval_rate }}%</td>
-                            <td>{{ "%.2f"|format(vehicle.avg_serious_faults) }}</td>
+                            <td class="approval-rate">{{ vehicle.approval_rate }}%</td>
+                            <td class="fault-count">{{ "%.2f"|format(vehicle.avg_serious_faults) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -124,15 +161,15 @@
             </div>
 
             <div class="vehicle-list">
-                <h2>Bottom 20 Least Reliable Vehicles</h2>
+                <h2>Bunn 20 Minst Pålitelige Biler</h2>
                 <table>
                     <thead>
                         <tr>
-                            <th>Make</th>
-                            <th>Model</th>
-                            <th>Year</th>
-                            <th>Approval Rate</th>
-                            <th>Avg. Serious Faults</th>
+                            <th>Merke</th>
+                            <th>Modell</th>
+                            <th>År</th>
+                            <th>Godkjenningsrate</th>
+                            <th>Gj.snitt Alvorlige Feil</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -141,8 +178,8 @@
                             <td>{{ vehicle.make }}</td>
                             <td>{{ vehicle.model }}</td>
                             <td>{{ vehicle.year }}</td>
-                            <td>{{ vehicle.approval_rate }}%</td>
-                            <td>{{ "%.2f"|format(vehicle.avg_serious_faults) }}</td>
+                            <td class="approval-rate">{{ vehicle.approval_rate }}%</td>
+                            <td class="fault-count">{{ "%.2f"|format(vehicle.avg_serious_faults) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -155,35 +192,47 @@
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
         const searchResultsTable = document.getElementById('searchResultsTable').getElementsByTagName('tbody')[0];
+        const loadingIndicator = document.getElementById('loadingIndicator');
         
         let debounceTimeout;
         
         searchInput.addEventListener('input', function() {
             clearTimeout(debounceTimeout);
+            const query = this.value.trim();
+            
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                loadingIndicator.style.display = 'none';
+                return;
+            }
+            
             debounceTimeout = setTimeout(() => {
-                const query = this.value.trim();
-                if (query.length >= 2) {
-                    fetch(`/search?query=${encodeURIComponent(query)}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            searchResults.style.display = 'block';
-                            searchResultsTable.innerHTML = '';
-                            
-                            data.forEach(vehicle => {
-                                const row = searchResultsTable.insertRow();
-                                row.innerHTML = `
-                                    <td>${vehicle.make}</td>
-                                    <td>${vehicle.model}</td>
-                                    <td>${vehicle.year}</td>
-                                    <td>${vehicle.approval_rate}%</td>
-                                    <td>${vehicle.avg_serious_faults.toFixed(2)}</td>
-                                    <td>${vehicle.total_inspections}</td>
-                                `;
-                            });
+                loadingIndicator.style.display = 'block';
+                
+                fetch(`/search?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        searchResults.style.display = 'block';
+                        searchResultsTable.innerHTML = '';
+                        
+                        data.forEach(vehicle => {
+                            const row = searchResultsTable.insertRow();
+                            row.innerHTML = `
+                                <td>${vehicle.make}</td>
+                                <td>${vehicle.model}</td>
+                                <td>${vehicle.year}</td>
+                                <td class="approval-rate">${vehicle.approval_rate}%</td>
+                                <td class="fault-count">${vehicle.avg_serious_faults.toFixed(2)}</td>
+                                <td>${vehicle.total_inspections}</td>
+                            `;
                         });
-                } else {
-                    searchResults.style.display = 'none';
-                }
+                        
+                        loadingIndicator.style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error('Feil:', error);
+                        loadingIndicator.style.display = 'none';
+                    });
             }, 300);
         });
     </script>
